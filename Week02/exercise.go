@@ -40,8 +40,8 @@ func (*XModelService) getXModel(id int) (*XModel, error) {
 	if err == nil {
 		return xModel, nil
 	}
-	// we should return error if it is an error for user when there is no data.
-	// but we think no data is not an error for user, we just tell user there is no data.
+	// we should return error if no data is an error for user from business point of view.
+	// but we don't think no data is an error for user at present, so we just tell user there is no data.
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, nil
 	}
