@@ -47,5 +47,6 @@ func (*XModelService) getXModel(id int) (*XModel, error) {
 	}
 	// log error and return service temporary unavailable for other erorrs.
 	fmt.Printf("%+v\n", err)
-	return nil, ErrServiceTemporaryUnavailable
+	// sentinel error should be wrapped with fmt.Errorf("%w")
+	return nil, fmt.Errorf("%w", ErrServiceTemporaryUnavailable)
 }

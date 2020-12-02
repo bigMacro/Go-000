@@ -1,10 +1,10 @@
 package Week02
 
 import (
+	"errors"
 	"testing"
 
-	"github.com/pkg/errors"
-
+	pkgError "github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -32,7 +32,7 @@ func TestXModelService(t *testing.T) {
 
 	// query error
 	{
-		var mockErr = errors.New("mock query error")
+		var mockErr = pkgError.New("mock query error")
 		mockQueryXModel = func() (*XModel, error) {
 			return nil, mockErr
 		}
@@ -42,6 +42,6 @@ func TestXModelService(t *testing.T) {
 		assert.Nil(t, xModel)
 		assert.NotNil(t, err)
 		assert.NotEqual(t, mockErr, err)
-		assert.Equal(t, ErrServiceTemporaryUnavailable, err)
+		assert.True(t, errors.Is(err, ErrServiceTemporaryUnavailable))
 	}
 }
