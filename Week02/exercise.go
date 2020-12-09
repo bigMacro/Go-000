@@ -25,7 +25,7 @@ func (*XModelDao) getXModel(id int) (*XModel, error) {
 	xModel, err := mockQueryXModel()
 	if err != nil {
 		// errors from standard package should be wrapped with extra messages.
-		return nil, pkgError.Wrap(err, fmt.Sprintf("get XModel(%v) failed", id))
+		return nil, pkgError.Wrapf(err, "get XModel(%v) failed", id)
 	}
 	return xModel, nil
 }
