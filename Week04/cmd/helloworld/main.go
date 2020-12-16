@@ -22,7 +22,9 @@ import (
 */
 
 func main() {
-	g, ctx := errgroup.WithContext(context.Background())
+	ctx, cancel := context.WithCancel(context.Background())
+	g, _ := errgroup.WithContext(ctx)
+
 	g.Go(func() error {
 		lis, err := net.Listen("tcp", ":666")
 		if err != nil {
@@ -40,10 +42,10 @@ func main() {
 		select {
 		case <-ctx.Done():
 			// graceful stop
-			stopCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			stopCtx, stopCancel := context.WithTimeout(context.Background(), 5*time.Second)
 			go func() {
 				s.GracefulStop()
-				cancel()
+				stopCancel()
 			}()
 
 			select {
@@ -59,20 +61,18 @@ func main() {
 		}
 	})
 
-	errExit := errors.New("exited by signal")
 	g.Go(func() error {
 		sigChan := make(chan os.Signal)
 		signal.Notify(sigChan, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGTERM)
 		select {
 		case <-sigChan:
-			return errExit
+			cancel()
 		case <-ctx.Done():
-			return nil
 		}
 		return nil
 	})
 
-	if err := g.Wait(); !errors.Is(err, errExit) {
+	if err := g.Wait(); err != nil {
 		log.Fatal(err)
 	}
 }
